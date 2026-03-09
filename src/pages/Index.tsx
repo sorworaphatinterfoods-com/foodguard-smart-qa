@@ -1,21 +1,30 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ModuleCard } from '@/components/ModuleCard';
 import { KPICard } from '@/components/KPICard';
-import { mockKPIs } from '@/lib/mock-data';
+import { mockKPIs, mockDeviations } from '@/lib/mock-data';
 import {
   ClipboardList, Thermometer, AlertTriangle, Leaf,
   Wrench, CheckSquare, MessageSquare, GitBranch,
+  Droplets, ShieldAlert, Search as SearchIcon, FileText,
+  Database, BarChart3, Magnet,
 } from 'lucide-react';
 
 const modules = [
-  { title: 'Raw Material Receiving', description: 'Inspect incoming materials', icon: ClipboardList, path: '/receiving', badge: 3, badgeStatus: 'warning' as const },
-  { title: 'CCP Monitoring', description: 'Critical control points', icon: Thermometer, path: '/ccp', badge: 1, badgeStatus: 'fail' as const },
-  { title: 'NCR / CAPA', description: 'Nonconformance & actions', icon: AlertTriangle, path: '/ncr', badge: 2, badgeStatus: 'warning' as const },
-  { title: 'Environmental / GMP', description: 'Temp, humidity, sanitation', icon: Leaf, path: '/environment' },
-  { title: 'Calibration', description: 'Instrument tracking', icon: Wrench, path: '/calibration', badge: 1, badgeStatus: 'fail' as const },
-  { title: 'Internal Audit', description: 'GMP/HACCP checklists', icon: CheckSquare, path: '/audit' },
-  { title: 'Complaints', description: 'Customer complaint tracking', icon: MessageSquare, path: '/complaints' },
-  { title: 'Traceability', description: 'Forward & backward trace', icon: GitBranch, path: '/traceability' },
+  { title: 'Inspection Log', description: 'บันทึกการตรวจสอบทุกกระบวนการ', icon: FileText, path: '/inspection', badge: 4, badgeStatus: 'warning' as const },
+  { title: 'Raw Material Receiving', description: 'ตรวจรับวัตถุดิบ & COA', icon: ClipboardList, path: '/receiving', badge: 3, badgeStatus: 'warning' as const },
+  { title: 'CCP Monitoring', description: 'จุดควบคุมวิกฤต HACCP', icon: Thermometer, path: '/ccp', badge: 1, badgeStatus: 'fail' as const },
+  { title: 'Metal Detector', description: 'ทดสอบเครื่องตรวจโลหะ Fe/NonFe/SUS', icon: Magnet, path: '/metal-detector' },
+  { title: 'NCR / CAPA', description: 'รายงานความไม่สอดคล้อง & แก้ไข', icon: AlertTriangle, path: '/ncr', badge: 2, badgeStatus: 'warning' as const },
+  { title: 'Deviations & CAPA', description: 'ความผิดปกติ & การแก้ไข', icon: ShieldAlert, path: '/deviations', badge: mockDeviations.filter(d => d.status === 'OPEN').length, badgeStatus: 'fail' as const },
+  { title: 'Environmental / GMP', description: 'อุณหภูมิ ความชื้น สุขาภิบาล', icon: Leaf, path: '/environment' },
+  { title: 'Water Quality', description: 'คุณภาพน้ำ pH, Chlorine, E.Coli', icon: Droplets, path: '/water' },
+  { title: 'Allergen Control', description: 'ควบคุมสารก่อภูมิแพ้', icon: ShieldAlert, path: '/allergen' },
+  { title: 'Calibration', description: 'สอบเทียบเครื่องมือวัด', icon: Wrench, path: '/calibration', badge: 1, badgeStatus: 'fail' as const },
+  { title: 'Internal Audit', description: 'ตรวจประเมิน GMP/HACCP', icon: CheckSquare, path: '/audit' },
+  { title: 'Complaints', description: 'เรื่องร้องเรียนลูกค้า', icon: MessageSquare, path: '/complaints' },
+  { title: 'Traceability', description: 'ตรวจสอบย้อนกลับ ผู้ส่ง→ลูกค้า', icon: GitBranch, path: '/traceability' },
+  { title: 'Sampling Plan', description: 'ตาราง AQL ตาม ISO 2859-1', icon: BarChart3, path: '/sampling' },
+  { title: 'Master Data', description: 'พนักงาน ซัพพลายเออร์ อุปกรณ์ HACCP', icon: Database, path: '/master-data' },
 ];
 
 export default function Dashboard() {
