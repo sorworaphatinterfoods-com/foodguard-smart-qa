@@ -13,7 +13,13 @@ import NCRList from "./pages/NCRList";
 import NCRForm from "./pages/NCRForm";
 import CalibrationList from "./pages/CalibrationList";
 import MoreModules from "./pages/MoreModules";
-import PlaceholderPage from "./pages/PlaceholderPage";
+import EnvironmentList from "./pages/EnvironmentList";
+import EnvironmentForm from "./pages/EnvironmentForm";
+import AuditList from "./pages/AuditList";
+import AuditForm from "./pages/AuditForm";
+import ComplaintList from "./pages/ComplaintList";
+import ComplaintForm from "./pages/ComplaintForm";
+import TraceabilityPage from "./pages/TraceabilityPage";
 
 const queryClient = new QueryClient();
 
@@ -33,10 +39,13 @@ const App = () => (
           <Route path="/ncr/new" element={<NCRForm />} />
           <Route path="/calibration" element={<CalibrationList />} />
           <Route path="/more" element={<MoreModules />} />
-          <Route path="/environment" element={<PlaceholderPage title="Environmental Monitoring" moduleName="Environmental / GMP Monitoring" />} />
-          <Route path="/audit" element={<PlaceholderPage title="Internal Audit" moduleName="Internal Audit Module" />} />
-          <Route path="/complaints" element={<PlaceholderPage title="Complaints" moduleName="Complaint Management" />} />
-          <Route path="/traceability" element={<PlaceholderPage title="Traceability" moduleName="Traceability Module" />} />
+          <Route path="/environment" element={<EnvironmentList />} />
+          <Route path="/environment/new" element={<EnvironmentForm />} />
+          <Route path="/audit" element={<AuditList />} />
+          <Route path="/audit/new" element={<AuditForm />} />
+          <Route path="/complaints" element={<ComplaintList />} />
+          <Route path="/complaints/new" element={<ComplaintForm />} />
+          <Route path="/traceability" element={<TraceabilityPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
