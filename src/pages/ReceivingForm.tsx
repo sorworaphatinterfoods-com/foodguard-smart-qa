@@ -40,7 +40,7 @@ export default function ReceivingForm() {
                 <SelectTrigger><SelectValue placeholder="Select supplier" /></SelectTrigger>
                 <SelectContent>
                   {mockSuppliers.map(s => (
-                    <SelectItem key={s.id} value={s.id}>{s.name} ({s.code})</SelectItem>
+                    <SelectItem key={s.supplierId} value={s.supplierId}>{s.supplierName} ({s.supplierId})</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
