@@ -85,3 +85,63 @@ export interface DashboardKPI {
   trend?: 'up' | 'down' | 'stable';
   status?: 'pass' | 'warning' | 'fail';
 }
+
+export interface EnvironmentalRecord {
+  id: string;
+  date: string;
+  time: string;
+  zone: string;
+  type: 'temperature' | 'humidity' | 'sanitation' | 'pest_control';
+  value?: number;
+  unit?: string;
+  result: 'pass' | 'fail';
+  inspector: string;
+  notes: string;
+}
+
+export interface AuditRecord {
+  id: string;
+  date: string;
+  auditType: 'GMP' | 'HACCP' | 'Internal' | 'Supplier';
+  auditor: string;
+  area: string;
+  totalItems: number;
+  passedItems: number;
+  score: number;
+  status: 'scheduled' | 'in_progress' | 'completed';
+  findings: AuditFinding[];
+}
+
+export interface AuditFinding {
+  id: string;
+  checkItem: string;
+  result: 'conforming' | 'minor_nc' | 'major_nc' | 'observation';
+  notes: string;
+}
+
+export interface ComplaintRecord {
+  id: string;
+  date: string;
+  customerName: string;
+  productName: string;
+  lotNumber: string;
+  category: 'foreign_body' | 'quality' | 'labeling' | 'allergen' | 'packaging' | 'other';
+  description: string;
+  severity: 'low' | 'medium' | 'high';
+  status: 'received' | 'investigating' | 'resolved' | 'closed';
+  linkedNCR?: string;
+  resolution?: string;
+}
+
+export interface TraceabilityNode {
+  id: string;
+  type: 'supplier' | 'raw_material' | 'batch' | 'finished_good' | 'shipment' | 'customer';
+  label: string;
+  details: string;
+  date: string;
+}
+
+export interface TraceabilityLink {
+  fromId: string;
+  toId: string;
+}
