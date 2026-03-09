@@ -1,4 +1,4 @@
-import { RawMaterialReceiving, CCPRecord, NCR, CalibrationRecord, DashboardKPI } from './types';
+import { RawMaterialReceiving, CCPRecord, NCR, CalibrationRecord, DashboardKPI, EnvironmentalRecord, AuditRecord, ComplaintRecord, TraceabilityNode } from './types';
 
 export const mockSuppliers = [
   { id: 's1', name: 'Fresh Farm Co.', code: 'SUP-001', contact: 'John Doe' },
