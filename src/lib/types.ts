@@ -230,6 +230,14 @@ export interface ComplaintLog {
   status: 'Open' | 'Investigating' | 'Resolved' | 'Closed';
 }
 
+// CCP master/plan (definition + critical limit), as stored in D1 `ccp_master`.
+export interface CcpMaster {
+  id: string;
+  process: string;
+  ccpName: string;
+  criticalLimit: string;
+}
+
 // ===== Dashboard =====
 export interface DashboardKPI {
   label: string;

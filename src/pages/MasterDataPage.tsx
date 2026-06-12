@@ -2,10 +2,15 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { mockSuppliers, mockRawMaterials, mockProducts, mockEquipment, mockEmployees, mockProcesses, mockHACCPCCPs, mockGHPChecklist } from '@/lib/mock-data';
+import { mockRawMaterials, mockProducts, mockEquipment, mockEmployees, mockProcesses } from '@/lib/mock-data';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useSuppliers } from '@/hooks/useSuppliers';
+import { useCcps } from '@/hooks/useCcps';
 
 export default function MasterDataPage() {
+  const { data: suppliers = [] } = useSuppliers();
+  const { data: ccps = [] } = useCcps();
+
   return (
     <AppLayout title="Master Data" showBack>
       <Tabs defaultValue="employees" className="w-full">
@@ -48,7 +53,7 @@ export default function MasterDataPage() {
 
         <TabsContent value="suppliers">
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-sm">02 — Supplier List</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">02 — Supplier List ({suppliers.length})</CardTitle></CardHeader>
             <CardContent className="overflow-x-auto p-2">
               <Table>
                 <TableHeader>
@@ -61,7 +66,7 @@ export default function MasterDataPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mockSuppliers.map(s => (
+                  {suppliers.map(s => (
                     <TableRow key={s.supplierId}>
                       <TableCell className="font-mono text-xs">{s.supplierId}</TableCell>
                       <TableCell className="text-xs">{s.supplierName}</TableCell>
@@ -191,13 +196,15 @@ export default function MasterDataPage() {
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-sm">12 — HACCP CCP Plan</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">12 — CCP Master / Plan ({ccps.length})</CardTitle></CardHeader>
             <CardContent className="space-y-2 p-3">
-              {mockHACCPCCPs.map((ccp, idx) => (
-                <div key={idx} className="bg-muted p-3 rounded text-xs">
-                  <p className="font-semibold">{ccp.process} — {ccp.hazard}</p>
+              {ccps.map((ccp) => (
+                <div key={ccp.id} className="bg-muted p-3 rounded text-xs">
+                  <p className="font-semibold">
+                    <span className="font-mono text-muted-foreground mr-1">{ccp.id}</span>
+                    {ccp.process} — {ccp.ccpName}
+                  </p>
                   <p><span className="text-muted-foreground">Critical Limit:</span> <span className="font-mono font-bold text-[hsl(var(--status-fail))]">{ccp.criticalLimit}</span></p>
-                  <p><span className="text-muted-foreground">Monitoring:</span> {ccp.monitoring} · <span className="text-muted-foreground">Action:</span> {ccp.correctiveAction}</p>
                 </div>
               ))}
             </CardContent>
