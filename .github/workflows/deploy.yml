@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - claude/deploy-kjxbqt
   workflow_dispatch:
 
 # Allow the GITHUB_TOKEN to deploy to Pages and verify the deployment.

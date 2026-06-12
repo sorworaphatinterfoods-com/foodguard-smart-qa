@@ -1,0 +1,13 @@
+# Cloudflare Pages configuration.
+# When the repo is connected to Cloudflare Pages (Git integration), Cloudflare
+# reads this file to build the site and wire up bindings such as D1.
+name = "foodguard-smart-qa"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-01-01"
+
+# D1 binding — available inside Pages Functions as `env.DB`.
+# Points at the existing "smart-qa-db" database.
+[[d1_databases]]
+binding = "DB"
+database_name = "smart-qa-db"
+database_id = "e7fbe213-5e69-4bfa-bc63-bba305216402"
