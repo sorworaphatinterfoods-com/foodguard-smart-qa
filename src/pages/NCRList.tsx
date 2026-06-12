@@ -2,7 +2,8 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { mockNCRs } from '@/lib/mock-data';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useNcrs } from '@/hooks/useNcrs';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,18 +22,29 @@ const statusLabel: Record<string, string> = {
 
 export default function NCRList() {
   const navigate = useNavigate();
+  const { data: ncrs = [], isLoading } = useNcrs();
 
   return (
     <AppLayout title="NCR / CAPA" showBack>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-muted-foreground">{mockNCRs.length} records</p>
+        <p className="text-sm text-muted-foreground">
+          {isLoading ? 'Loading…' : `${ncrs.length} records`}
+        </p>
         <Button size="sm" onClick={() => navigate('/ncr/new')}>
           <Plus className="w-4 h-4 mr-1" /> New NCR
         </Button>
       </div>
 
+      {isLoading && (
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 w-full rounded-lg" />
+          ))}
+        </div>
+      )}
+
       <div className="space-y-2">
-        {mockNCRs.map((ncr) => (
+        {ncrs.map((ncr) => (
           <Card key={ncr.id} className={ncr.status === 'closed' ? 'opacity-60' : ''}>
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">
