@@ -1,7 +1,8 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ModuleCard } from '@/components/ModuleCard';
 import { KPICard } from '@/components/KPICard';
-import { mockKPIs, mockDeviations } from '@/lib/mock-data';
+import { mockDeviations } from '@/lib/mock-data';
+import { useDashboard } from '@/hooks/useDashboard';
 import {
   ClipboardList, Thermometer, AlertTriangle, Leaf,
   Wrench, CheckSquare, MessageSquare, GitBranch,
@@ -28,13 +29,15 @@ const modules = [
 ];
 
 export default function Dashboard() {
+  const { data: kpis = [] } = useDashboard();
+
   return (
     <AppLayout>
       {/* KPI Grid */}
       <section className="mb-6">
         <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">Key Performance Indicators</h2>
         <div className="grid grid-cols-2 gap-2">
-          {mockKPIs.map((kpi) => (
+          {kpis.map((kpi) => (
             <KPICard key={kpi.label} kpi={kpi} />
           ))}
         </div>

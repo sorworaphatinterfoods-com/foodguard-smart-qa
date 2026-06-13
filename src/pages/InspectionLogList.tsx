@@ -1,25 +1,37 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatusIndicator } from '@/components/StatusIndicator';
-import { mockInspectionLogs } from '@/lib/mock-data';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useInspections } from '@/hooks/useInspections';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function InspectionLogList() {
   const navigate = useNavigate();
+  const { data: logs = [], isLoading } = useInspections();
 
   return (
     <AppLayout title="Inspection Log" showBack>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-muted-foreground">{mockInspectionLogs.length} records</p>
+        <p className="text-sm text-muted-foreground">
+          {isLoading ? 'Loading…' : `${logs.length} records`}
+        </p>
         <Button size="sm" onClick={() => navigate('/inspection/new')}>
           <Plus className="w-4 h-4 mr-1" /> New Entry
         </Button>
       </div>
 
+      {isLoading && (
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 w-full rounded-lg" />
+          ))}
+        </div>
+      )}
+
       <div className="space-y-2">
-        {mockInspectionLogs.map((log) => (
+        {logs.map((log) => (
           <Card key={log.id} className={log.status === 'FAIL' ? 'border-destructive/50' : ''}>
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">

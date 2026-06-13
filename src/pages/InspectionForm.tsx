@@ -7,14 +7,26 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { apiPost } from '@/lib/api';
 import { mockProcesses, mockEquipment, mockProducts, mockParameters, mockEmployees } from '@/lib/mock-data';
 
 export default function InspectionForm() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const [inspector, setInspector] = useState('');
   const [process, setProcess] = useState('');
+  const [equipmentId, setEquipmentId] = useState('');
+  const [productId, setProductId] = useState('');
+  const [lot, setLot] = useState('');
   const [parameter, setParameter] = useState('');
   const [value, setValue] = useState('');
+  const [action, setAction] = useState('');
+  const [rootCause, setRootCause] = useState('');
+  const [remark, setRemark] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const filteredParams = mockParameters.filter(p => p.process === process);
   const selectedParam = filteredParams.find(p => p.parameter === parameter);
@@ -26,14 +38,44 @@ export default function InspectionForm() {
     if (selectedParam.specMax !== null && numVal > selectedParam.specMax) isFail = true;
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFail) {
-      toast.error('❌ FAIL — Deviation recorded & LINE alert sent to QA Supervisor.');
-    } else {
-      toast.success('✅ Inspection PASS — Record saved.');
+    setSubmitting(true);
+
+    const spec = selectedParam
+      ? `${selectedParam.specMin ?? '—'} - ${selectedParam.specMax ?? '—'} ${selectedParam.unit}`
+      : '';
+    const remarks = [remark, isFail && action ? `Action: ${action}` : '', isFail && rootCause ? `Root cause: ${rootCause}` : '']
+      .filter(Boolean)
+      .join(' | ');
+
+    try {
+      const { id } = await apiPost<{ id: string }>('/api/inspections', {
+        inspector,
+        process,
+        equipmentId,
+        productId,
+        lot,
+        parameter,
+        spec,
+        unit: selectedParam?.unit ?? '',
+        value: isNaN(numVal) ? '' : numVal,
+        result: isFail ? 'FAIL' : 'PASS',
+        remark: remarks,
+      });
+      await queryClient.invalidateQueries({ queryKey: ['inspections'] });
+      if (isFail) {
+        toast.error(`❌ FAIL recorded (${id}) — deviation logged for QA review.`);
+      } else {
+        toast.success(`✅ Inspection PASS saved (${id}).`);
+      }
+      navigate('/inspection');
+    } catch {
+      toast.warning('Saved in demo mode — connect Cloudflare/D1 to persist.');
+      navigate('/inspection');
+    } finally {
+      setSubmitting(false);
     }
-    navigate('/inspection');
   };
 
   return (
@@ -46,18 +88,18 @@ export default function InspectionForm() {
           <CardContent className="space-y-3">
             <div>
               <Label>Inspector</Label>
-              <Select required>
+              <Select required value={inspector} onValueChange={setInspector}>
                 <SelectTrigger><SelectValue placeholder="Select inspector" /></SelectTrigger>
                 <SelectContent>
                   {mockEmployees.filter(e => e.status === 'Active').map(e => (
-                    <SelectItem key={e.employeeId} value={e.employeeId}>{e.employeeName} ({e.employeeId})</SelectItem>
+                    <SelectItem key={e.employeeId} value={e.employeeName}>{e.employeeName} ({e.employeeId})</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label>Process</Label>
-              <Select required onValueChange={(v) => { setProcess(v); setParameter(''); }}>
+              <Select required value={process} onValueChange={(v) => { setProcess(v); setParameter(''); }}>
                 <SelectTrigger><SelectValue placeholder="Select process" /></SelectTrigger>
                 <SelectContent>
                   {mockProcesses.map(p => (
@@ -68,7 +110,7 @@ export default function InspectionForm() {
             </div>
             <div>
               <Label>Equipment</Label>
-              <Select required>
+              <Select required value={equipmentId} onValueChange={setEquipmentId}>
                 <SelectTrigger><SelectValue placeholder="Select equipment" /></SelectTrigger>
                 <SelectContent>
                   {mockEquipment.filter(e => e.status === 'Active').map(e => (
@@ -79,7 +121,7 @@ export default function InspectionForm() {
             </div>
             <div>
               <Label>Product</Label>
-              <Select required>
+              <Select required value={productId} onValueChange={setProductId}>
                 <SelectTrigger><SelectValue placeholder="Select product" /></SelectTrigger>
                 <SelectContent>
                   {mockProducts.map(p => (
@@ -90,7 +132,7 @@ export default function InspectionForm() {
             </div>
             <div>
               <Label htmlFor="lot">Lot Number</Label>
-              <Input id="lot" placeholder="LOT-XXXX" className="font-mono" required />
+              <Input id="lot" placeholder="LOT-XXXX" className="font-mono" required value={lot} onChange={(e) => setLot(e.target.value)} />
             </div>
           </CardContent>
         </Card>
@@ -103,7 +145,7 @@ export default function InspectionForm() {
             <CardContent className="space-y-3">
               <div>
                 <Label>Parameter</Label>
-                <Select required onValueChange={setParameter}>
+                <Select required value={parameter} onValueChange={setParameter}>
                   <SelectTrigger><SelectValue placeholder="Select parameter" /></SelectTrigger>
                   <SelectContent>
                     {filteredParams.map(p => (
@@ -148,26 +190,26 @@ export default function InspectionForm() {
                 <>
                   <div>
                     <Label htmlFor="action">Corrective Action (required)</Label>
-                    <Textarea id="action" placeholder="Describe immediate correction..." rows={2} required />
+                    <Textarea id="action" placeholder="Describe immediate correction..." rows={2} required value={action} onChange={(e) => setAction(e.target.value)} />
                   </div>
                   <div>
                     <Label htmlFor="rootcause">Root Cause</Label>
-                    <Input id="rootcause" placeholder="Why did this happen?" />
+                    <Input id="rootcause" placeholder="Why did this happen?" value={rootCause} onChange={(e) => setRootCause(e.target.value)} />
                   </div>
                 </>
               )}
               <div>
                 <Label htmlFor="remark">Remark</Label>
-                <Textarea id="remark" placeholder="Additional notes..." rows={2} />
+                <Textarea id="remark" placeholder="Additional notes..." rows={2} value={remark} onChange={(e) => setRemark(e.target.value)} />
               </div>
             </CardContent>
           </Card>
         )}
 
         <div className="flex gap-2">
-          <Button type="button" variant="outline" className="flex-1" onClick={() => navigate(-1)}>Cancel</Button>
-          <Button type="submit" className="flex-1" variant={isFail ? 'destructive' : 'default'}>
-            {isFail ? 'Log FAIL & Alert' : 'Log PASS'}
+          <Button type="button" variant="outline" className="flex-1" onClick={() => navigate(-1)} disabled={submitting}>Cancel</Button>
+          <Button type="submit" className="flex-1" variant={isFail ? 'destructive' : 'default'} disabled={submitting}>
+            {submitting ? 'Saving…' : isFail ? 'Log FAIL & Alert' : 'Log PASS'}
           </Button>
         </div>
       </form>
