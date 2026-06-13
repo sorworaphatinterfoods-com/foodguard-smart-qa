@@ -2,7 +2,8 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusIndicator } from '@/components/StatusIndicator';
-import { mockReceiving } from '@/lib/mock-data';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useReceiving } from '@/hooks/useReceiving';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { InspectionResult } from '@/lib/types';
@@ -15,18 +16,29 @@ const resultStatus: Record<InspectionResult, 'pass' | 'warning' | 'fail'> = {
 
 export default function ReceivingList() {
   const navigate = useNavigate();
+  const { data: receiving = [], isLoading } = useReceiving();
 
   return (
     <AppLayout title="Raw Material Receiving" showBack>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-muted-foreground">{mockReceiving.length} records</p>
+        <p className="text-sm text-muted-foreground">
+          {isLoading ? 'Loading…' : `${receiving.length} records`}
+        </p>
         <Button size="sm" onClick={() => navigate('/receiving/new')}>
           <Plus className="w-4 h-4 mr-1" /> New
         </Button>
       </div>
 
+      {isLoading && (
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 w-full rounded-lg" />
+          ))}
+        </div>
+      )}
+
       <div className="space-y-2">
-        {mockReceiving.map((rec) => (
+        {receiving.map((rec) => (
           <Card key={rec.id} className="active:scale-[0.99] transition-transform">
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">

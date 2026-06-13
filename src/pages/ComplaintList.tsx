@@ -2,9 +2,10 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { mockComplaintLogs } from '@/lib/mock-data';
+import { useComplaints } from '@/hooks/useComplaints';
 
 const statusColors: Record<string, string> = {
   Open: 'bg-status-fail',
@@ -15,18 +16,29 @@ const statusColors: Record<string, string> = {
 
 export default function ComplaintList() {
   const navigate = useNavigate();
+  const { data: complaints = [], isLoading } = useComplaints();
 
   return (
     <AppLayout title="Complaints" showBack>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-muted-foreground">{mockComplaintLogs.length} complaints</p>
+        <p className="text-sm text-muted-foreground">
+          {isLoading ? 'Loading…' : `${complaints.length} complaints`}
+        </p>
         <Button size="sm" onClick={() => navigate('/complaints/new')}>
           <Plus className="w-4 h-4 mr-1" /> New Complaint
         </Button>
       </div>
 
+      {isLoading && (
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-lg" />
+          ))}
+        </div>
+      )}
+
       <div className="space-y-2">
-        {mockComplaintLogs.map((c) => (
+        {complaints.map((c) => (
           <Card key={c.id} className={c.status === 'Closed' ? 'opacity-60' : ''}>
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">
