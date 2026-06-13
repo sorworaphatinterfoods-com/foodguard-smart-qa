@@ -10,8 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { apiPost } from '@/lib/api';
-import { mockEquipment, mockEmployees } from '@/lib/mock-data';
-import { useProcesses, useFinishedGoods, useParameters } from '@/hooks/useMasterData';
+import { mockEmployees } from '@/lib/mock-data';
+import { useProcesses, useFinishedGoods, useParameters, useEquipment } from '@/hooks/useMasterData';
 
 // Best-effort parse of a free-text spec limit ("0 - 4", "≥ 75", "≤ -18").
 function parseSpec(spec: string): { min: number | null; max: number | null } {
@@ -29,6 +29,7 @@ export default function InspectionForm() {
   const { data: processes = [] } = useProcesses();
   const { data: products = [] } = useFinishedGoods();
   const { data: parameters = [] } = useParameters();
+  const { data: equipment = [] } = useEquipment();
 
   const [inspector, setInspector] = useState('');
   const [process, setProcess] = useState('');
@@ -124,7 +125,7 @@ export default function InspectionForm() {
               <Select required value={equipmentId} onValueChange={setEquipmentId}>
                 <SelectTrigger><SelectValue placeholder="Select equipment" /></SelectTrigger>
                 <SelectContent>
-                  {mockEquipment.filter(e => e.status === 'Active').map(e => (
+                  {equipment.map(e => (
                     <SelectItem key={e.equipmentId} value={e.equipmentId}>{e.equipmentName} ({e.equipmentId})</SelectItem>
                   ))}
                 </SelectContent>

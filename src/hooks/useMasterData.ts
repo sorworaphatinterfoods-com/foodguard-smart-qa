@@ -1,11 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/lib/api';
-import { mockProcesses, mockProducts, mockParameters } from '@/lib/mock-data';
+import { mockProcesses, mockProducts, mockParameters, mockEquipment } from '@/lib/mock-data';
 
 export interface ProcessOption {
   processId: string;
   processName: string;
   area: string;
+}
+
+export interface EquipmentOption {
+  equipmentId: string;
+  equipmentName: string;
+  equipmentType: string;
 }
 
 export interface FinishedGoodOption {
@@ -32,6 +38,20 @@ export function useProcesses() {
         return await apiGet<ProcessOption[]>('/api/processes');
       } catch {
         return mockProcesses.map((p) => ({ processId: p.processId, processName: p.processName, area: p.area }));
+      }
+    },
+    staleTime: 60_000,
+  });
+}
+
+export function useEquipment() {
+  return useQuery<EquipmentOption[]>({
+    queryKey: ['equipment'],
+    queryFn: async () => {
+      try {
+        return await apiGet<EquipmentOption[]>('/api/equipment');
+      } catch {
+        return mockEquipment.map((e) => ({ equipmentId: e.equipmentId, equipmentName: e.equipmentName, equipmentType: '' }));
       }
     },
     staleTime: 60_000,
