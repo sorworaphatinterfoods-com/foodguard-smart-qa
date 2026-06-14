@@ -10,11 +10,26 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { apiPost } from '@/lib/api';
-import { mockProcesses, mockEquipment, mockProducts, mockParameters, mockEmployees } from '@/lib/mock-data';
+import { mockEmployees } from '@/lib/mock-data';
+import { useProcesses, useFinishedGoods, useParameters, useEquipment } from '@/hooks/useMasterData';
+
+// Best-effort parse of a free-text spec limit ("0 - 4", "≥ 75", "≤ -18").
+function parseSpec(spec: string): { min: number | null; max: number | null } {
+  const s = (spec || '').replace(/[()]/g, ' ');
+  const nums = (s.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+  if (/≥|>=/.test(s)) return { min: nums[0] ?? null, max: null };
+  if (/≤|<=/.test(s)) return { min: null, max: nums[0] ?? null };
+  if (nums.length >= 2) return { min: Math.min(nums[0], nums[1]), max: Math.max(nums[0], nums[1]) };
+  return { min: null, max: null };
+}
 
 export default function InspectionForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { data: processes = [] } = useProcesses();
+  const { data: products = [] } = useFinishedGoods();
+  const { data: parameters = [] } = useParameters();
+  const { data: equipment = [] } = useEquipment();
 
   const [inspector, setInspector] = useState('');
   const [process, setProcess] = useState('');
@@ -28,23 +43,20 @@ export default function InspectionForm() {
   const [remark, setRemark] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const filteredParams = mockParameters.filter(p => p.process === process);
-  const selectedParam = filteredParams.find(p => p.parameter === parameter);
+  const selectedParam = parameters.find(p => p.name === parameter);
+  const { min, max } = selectedParam ? parseSpec(selectedParam.specLimit) : { min: null, max: null };
 
   const numVal = parseFloat(value);
   let isFail = false;
   if (selectedParam && !isNaN(numVal)) {
-    if (selectedParam.specMin !== null && numVal < selectedParam.specMin) isFail = true;
-    if (selectedParam.specMax !== null && numVal > selectedParam.specMax) isFail = true;
+    if (min !== null && numVal < min) isFail = true;
+    if (max !== null && numVal > max) isFail = true;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
 
-    const spec = selectedParam
-      ? `${selectedParam.specMin ?? '—'} - ${selectedParam.specMax ?? '—'} ${selectedParam.unit}`
-      : '';
     const remarks = [remark, isFail && action ? `Action: ${action}` : '', isFail && rootCause ? `Root cause: ${rootCause}` : '']
       .filter(Boolean)
       .join(' | ');
@@ -57,7 +69,7 @@ export default function InspectionForm() {
         productId,
         lot,
         parameter,
-        spec,
+        spec: selectedParam?.specLimit ?? '',
         unit: selectedParam?.unit ?? '',
         value: isNaN(numVal) ? '' : numVal,
         result: isFail ? 'FAIL' : 'PASS',
@@ -102,8 +114,8 @@ export default function InspectionForm() {
               <Select required value={process} onValueChange={(v) => { setProcess(v); setParameter(''); }}>
                 <SelectTrigger><SelectValue placeholder="Select process" /></SelectTrigger>
                 <SelectContent>
-                  {mockProcesses.map(p => (
-                    <SelectItem key={p.processId} value={p.processName}>{p.processName} ({p.type})</SelectItem>
+                  {processes.map(p => (
+                    <SelectItem key={p.processId} value={p.processName}>{p.processName} ({p.processId})</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -113,18 +125,18 @@ export default function InspectionForm() {
               <Select required value={equipmentId} onValueChange={setEquipmentId}>
                 <SelectTrigger><SelectValue placeholder="Select equipment" /></SelectTrigger>
                 <SelectContent>
-                  {mockEquipment.filter(e => e.status === 'Active').map(e => (
+                  {equipment.map(e => (
                     <SelectItem key={e.equipmentId} value={e.equipmentId}>{e.equipmentName} ({e.equipmentId})</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Product</Label>
+              <Label>Product (FG)</Label>
               <Select required value={productId} onValueChange={setProductId}>
                 <SelectTrigger><SelectValue placeholder="Select product" /></SelectTrigger>
                 <SelectContent>
-                  {mockProducts.map(p => (
+                  {products.map(p => (
                     <SelectItem key={p.productId} value={p.productId}>{p.productName} ({p.productId})</SelectItem>
                   ))}
                 </SelectContent>
@@ -148,9 +160,9 @@ export default function InspectionForm() {
                 <Select required value={parameter} onValueChange={setParameter}>
                   <SelectTrigger><SelectValue placeholder="Select parameter" /></SelectTrigger>
                   <SelectContent>
-                    {filteredParams.map(p => (
-                      <SelectItem key={p.parameter} value={p.parameter}>
-                        {p.parameter} ({p.unit}) {p.isCCP ? '⚡ CCP' : ''}
+                    {parameters.map(p => (
+                      <SelectItem key={p.id} value={p.name}>
+                        {p.name}{p.category === 'Food Safety' ? ' ⚡' : ''}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -160,15 +172,13 @@ export default function InspectionForm() {
                 <>
                   <div className="bg-muted p-3 rounded-lg text-xs">
                     <p><span className="text-muted-foreground">Spec:</span>{' '}
-                      <span className="font-mono font-semibold">
-                        {selectedParam.specMin !== null ? selectedParam.specMin : '—'} – {selectedParam.specMax !== null ? selectedParam.specMax : '—'} {selectedParam.unit}
-                      </span>
+                      <span className="font-mono font-semibold">{selectedParam.specLimit || '—'} {selectedParam.unit}</span>
                     </p>
-                    <p><span className="text-muted-foreground">Method:</span> {selectedParam.method} · {selectedParam.frequency}</p>
-                    {selectedParam.isCCP && <p className="text-[hsl(var(--status-warning))] font-semibold mt-1">⚡ This is a Critical Control Point (CCP)</p>}
+                    {selectedParam.category && <p><span className="text-muted-foreground">Category:</span> {selectedParam.category}</p>}
+                    {selectedParam.category === 'Food Safety' && <p className="text-[hsl(var(--status-warning))] font-semibold mt-1">⚡ Food Safety parameter</p>}
                   </div>
                   <div>
-                    <Label htmlFor="value">Measured Value ({selectedParam.unit})</Label>
+                    <Label htmlFor="value">Measured Value {selectedParam.unit ? `(${selectedParam.unit})` : ''}</Label>
                     <Input
                       id="value"
                       type="number"
