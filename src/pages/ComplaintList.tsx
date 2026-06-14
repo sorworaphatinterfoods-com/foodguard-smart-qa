@@ -7,6 +7,7 @@ import { Plus, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useComplaints } from '@/hooks/useComplaints';
 import { PrintReport, PrintColumn } from '@/components/PrintReport';
+import { ExportButton } from '@/components/ExportButton';
 import type { ComplaintLog } from '@/lib/types';
 
 const complaintColumns: PrintColumn<ComplaintLog>[] = [
@@ -36,7 +37,8 @@ export default function ComplaintList() {
         <p className="text-sm text-muted-foreground">
           {isLoading ? 'Loading…' : `${complaints.length} complaints`}
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 justify-end">
+          <ExportButton filename="complaints" columns={complaintColumns} rows={complaints} disabled={isLoading} />
           <Button variant="outline" size="sm" onClick={() => window.print()} disabled={isLoading || complaints.length === 0}>
             <Printer className="w-4 h-4 mr-1" /> พิมพ์ A4
           </Button>

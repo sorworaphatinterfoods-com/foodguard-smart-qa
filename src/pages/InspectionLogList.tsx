@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PrintReport, PrintColumn } from '@/components/PrintReport';
+import { ExportButton } from '@/components/ExportButton';
 import type { InspectionLog } from '@/lib/types';
 
 const inspectionColumns: PrintColumn<InspectionLog>[] = [
@@ -30,7 +31,8 @@ export default function InspectionLogList() {
         <p className="text-sm text-muted-foreground">
           {isLoading ? 'Loading…' : `${logs.length} records`}
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 justify-end">
+          <ExportButton filename="inspection-log" columns={inspectionColumns} rows={logs} disabled={isLoading} />
           <Button variant="outline" size="sm" onClick={() => window.print()} disabled={isLoading || logs.length === 0}>
             <Printer className="w-4 h-4 mr-1" /> พิมพ์ A4
           </Button>
