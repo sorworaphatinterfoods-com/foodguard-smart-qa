@@ -13,7 +13,7 @@ export function AppHeader({ title, showBack }: AppHeaderProps) {
   const pageTitle = title || getTitleFromPath(location.pathname);
 
   return (
-    <header className="sticky top-0 z-50 bg-card/95 backdrop-blur border-b border-border">
+    <header className="sticky top-0 z-50 bg-card/95 backdrop-blur border-b border-border print:hidden">
       <div className="flex items-center justify-between px-4 h-14 max-w-4xl mx-auto">
         <div className="flex items-center gap-2">
           {showBack && (

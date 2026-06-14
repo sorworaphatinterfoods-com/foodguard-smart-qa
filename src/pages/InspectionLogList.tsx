@@ -4,8 +4,21 @@ import { StatusIndicator } from '@/components/StatusIndicator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInspections } from '@/hooks/useInspections';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PrintReport, PrintColumn } from '@/components/PrintReport';
+import type { InspectionLog } from '@/lib/types';
+
+const inspectionColumns: PrintColumn<InspectionLog>[] = [
+  { header: 'ID', cell: (r) => r.id },
+  { header: 'Timestamp', cell: (r) => r.timestamp },
+  { header: 'Process', cell: (r) => r.process },
+  { header: 'Parameter', cell: (r) => r.parameter },
+  { header: 'Value', cell: (r) => r.value },
+  { header: 'Spec', cell: (r) => r.spec },
+  { header: 'Result', cell: (r) => r.status },
+  { header: 'Inspector', cell: (r) => r.inspector },
+];
 
 export default function InspectionLogList() {
   const navigate = useNavigate();
@@ -13,24 +26,31 @@ export default function InspectionLogList() {
 
   return (
     <AppLayout title="Inspection Log" showBack>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 print:hidden">
         <p className="text-sm text-muted-foreground">
           {isLoading ? 'Loading…' : `${logs.length} records`}
         </p>
-        <Button size="sm" onClick={() => navigate('/inspection/new')}>
-          <Plus className="w-4 h-4 mr-1" /> New Entry
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => window.print()} disabled={isLoading || logs.length === 0}>
+            <Printer className="w-4 h-4 mr-1" /> พิมพ์ A4
+          </Button>
+          <Button size="sm" onClick={() => navigate('/inspection/new')}>
+            <Plus className="w-4 h-4 mr-1" /> New Entry
+          </Button>
+        </div>
       </div>
 
+      <PrintReport title="Inspection Log Report" formCode="FM-QA-INS" columns={inspectionColumns} rows={logs} />
+
       {isLoading && (
-        <div className="space-y-2">
+        <div className="space-y-2 print:hidden">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-28 w-full rounded-lg" />
           ))}
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-2 print:hidden">
         {logs.map((log) => (
           <Card key={log.id} className={log.status === 'FAIL' ? 'border-destructive/50' : ''}>
             <CardContent className="p-4">

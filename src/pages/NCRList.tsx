@@ -4,8 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNcrs } from '@/hooks/useNcrs';
-import { Plus } from 'lucide-react';
+import { Plus, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PrintReport, PrintColumn } from '@/components/PrintReport';
+import type { NCR } from '@/lib/types';
+
+const ncrColumns: PrintColumn<NCR>[] = [
+  { header: 'ID', cell: (r) => r.id },
+  { header: 'Date', cell: (r) => r.date },
+  { header: 'Severity', cell: (r) => r.severity },
+  { header: 'Status', cell: (r) => r.status },
+  { header: 'Title', cell: (r) => r.title },
+  { header: 'Assigned', cell: (r) => r.assignedTo },
+  { header: 'Due', cell: (r) => r.dueDate },
+];
 
 const severityVariant: Record<string, 'default' | 'secondary' | 'destructive'> = {
   minor: 'secondary',
@@ -26,24 +38,31 @@ export default function NCRList() {
 
   return (
     <AppLayout title="NCR / CAPA" showBack>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 print:hidden">
         <p className="text-sm text-muted-foreground">
           {isLoading ? 'Loading…' : `${ncrs.length} records`}
         </p>
-        <Button size="sm" onClick={() => navigate('/ncr/new')}>
-          <Plus className="w-4 h-4 mr-1" /> New NCR
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => window.print()} disabled={isLoading || ncrs.length === 0}>
+            <Printer className="w-4 h-4 mr-1" /> พิมพ์ A4
+          </Button>
+          <Button size="sm" onClick={() => navigate('/ncr/new')}>
+            <Plus className="w-4 h-4 mr-1" /> New NCR
+          </Button>
+        </div>
       </div>
 
+      <PrintReport title="NCR / CAPA Report" formCode="FM-QA-NCR" columns={ncrColumns} rows={ncrs} />
+
       {isLoading && (
-        <div className="space-y-2">
+        <div className="space-y-2 print:hidden">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-28 w-full rounded-lg" />
           ))}
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-2 print:hidden">
         {ncrs.map((ncr) => (
           <Card key={ncr.id} className={ncr.status === 'closed' ? 'opacity-60' : ''}>
             <CardContent className="p-4">
