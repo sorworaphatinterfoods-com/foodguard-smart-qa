@@ -13,22 +13,22 @@ export function AppHeader({ title, showBack }: AppHeaderProps) {
   const pageTitle = title || getTitleFromPath(location.pathname);
 
   return (
-    <header className="sticky top-0 z-50 bg-card/95 backdrop-blur border-b border-border print:hidden">
+    <header className="sticky top-0 z-50 bg-brand-gradient text-white shadow-md print:hidden">
       <div className="flex items-center justify-between px-4 h-14 max-w-4xl mx-auto">
         <div className="flex items-center gap-2">
           {showBack && (
-            <button onClick={() => navigate(-1)} className="p-1 -ml-1 text-muted-foreground hover:text-foreground">
+            <button onClick={() => navigate(-1)} className="p-1 -ml-1 text-white/80 hover:text-white">
               <ChevronLeft className="w-5 h-5" />
             </button>
           )}
           <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-primary" />
+            <Shield className="w-5 h-5 text-white" />
             <span className="font-semibold text-sm truncate">{pageTitle}</span>
           </div>
         </div>
-        <button className="p-2 text-muted-foreground hover:text-foreground relative">
+        <button className="p-2 text-white/80 hover:text-white relative">
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full ring-2 ring-white/60" />
         </button>
       </div>
     </header>

@@ -7,6 +7,8 @@ import { useNcrs } from '@/hooks/useNcrs';
 import { Plus, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PrintReport, PrintColumn } from '@/components/PrintReport';
+import { ExportButton } from '@/components/ExportButton';
+import { ImportNcrButton } from '@/components/ImportNcrButton';
 import type { NCR } from '@/lib/types';
 
 const ncrColumns: PrintColumn<NCR>[] = [
@@ -42,7 +44,9 @@ export default function NCRList() {
         <p className="text-sm text-muted-foreground">
           {isLoading ? 'Loading…' : `${ncrs.length} records`}
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 justify-end">
+          <ImportNcrButton />
+          <ExportButton filename="ncr-capa" columns={ncrColumns} rows={ncrs} disabled={isLoading} />
           <Button variant="outline" size="sm" onClick={() => window.print()} disabled={isLoading || ncrs.length === 0}>
             <Printer className="w-4 h-4 mr-1" /> พิมพ์ A4
           </Button>
