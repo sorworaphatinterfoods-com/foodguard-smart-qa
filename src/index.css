@@ -4,6 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* A4 print report styling */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+  html,
+  body,
+  #root {
+    background: #fff !important;
+  }
+  /* Render backgrounds/borders as designed when printing */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
 @layer base {
   :root {
     --background: 220 20% 10%;
