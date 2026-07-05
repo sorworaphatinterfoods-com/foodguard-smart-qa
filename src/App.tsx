@@ -31,6 +31,12 @@ import InspectionLogList from "./pages/InspectionLogList";
 import InspectionForm from "./pages/InspectionForm";
 import SamplingPlanPage from "./pages/SamplingPlanPage";
 import MasterDataPage from "./pages/MasterDataPage";
+import CcpDashboard from "./pages/ccp/CcpDashboard";
+import MetalDetectorNewTest from "./pages/ccp/MetalDetectorNewTest";
+import MetalDetectorTestRecords from "./pages/ccp/MetalDetectorTestRecords";
+import CcpDeviations from "./pages/ccp/CcpDeviations";
+import CcpHoldProducts from "./pages/ccp/CcpHoldProducts";
+import CcpVerification from "./pages/ccp/CcpVerification";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +54,13 @@ const App = () => (
           {/* CCP */}
           <Route path="/ccp" element={<CCPList />} />
           <Route path="/ccp/new" element={<CCPForm />} />
+          {/* HACCP CCP + Metal Detector Monitoring */}
+          <Route path="/ccp/dashboard" element={<CcpDashboard />} />
+          <Route path="/ccp/metal-detector/new-test" element={<MetalDetectorNewTest />} />
+          <Route path="/ccp/metal-detector/test-records" element={<MetalDetectorTestRecords />} />
+          <Route path="/ccp/deviations" element={<CcpDeviations />} />
+          <Route path="/ccp/hold-products" element={<CcpHoldProducts />} />
+          <Route path="/ccp/verification" element={<CcpVerification />} />
           {/* NCR/CAPA */}
           <Route path="/ncr" element={<NCRList />} />
           <Route path="/ncr/new" element={<NCRForm />} />

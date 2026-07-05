@@ -2,7 +2,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ModuleCard } from '@/components/ModuleCard';
 import {
   Leaf, Wrench, CheckSquare, MessageSquare, GitBranch,
-  Droplets, ShieldAlert, Magnet, BarChart3, Database, FileText
+  Droplets, ShieldAlert, Magnet, BarChart3, Database, FileText, ScanLine
 } from 'lucide-react';
 
 const modules = [
@@ -10,6 +10,7 @@ const modules = [
   { title: 'Environmental / GMP', description: 'อุณหภูมิ ความชื้น สุขาภิบาล', icon: Leaf, path: '/environment' },
   { title: 'Water Quality', description: 'คุณภาพน้ำ WHO standard', icon: Droplets, path: '/water' },
   { title: 'Allergen Control', description: 'ควบคุมสารก่อภูมิแพ้ FDA', icon: ShieldAlert, path: '/allergen' },
+  { title: 'CCP Metal Detector (HACCP)', description: 'ตรวจโลหะก่อนบรรจุ · Deviation/Hold/QA', icon: ScanLine, path: '/ccp/dashboard' },
   { title: 'Metal Detector', description: 'ทดสอบ Fe/NonFe/SUS', icon: Magnet, path: '/metal-detector' },
   { title: 'Deviations & CAPA', description: 'ความผิดปกติ & แก้ไข', icon: ShieldAlert, path: '/deviations' },
   { title: 'Calibration', description: 'สอบเทียบเครื่องมือวัด', icon: Wrench, path: '/calibration' },
