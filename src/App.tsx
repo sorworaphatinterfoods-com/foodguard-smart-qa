@@ -37,6 +37,9 @@ import MetalDetectorTestRecords from "./pages/ccp/MetalDetectorTestRecords";
 import CcpDeviations from "./pages/ccp/CcpDeviations";
 import CcpHoldProducts from "./pages/ccp/CcpHoldProducts";
 import CcpVerification from "./pages/ccp/CcpVerification";
+import ThermalDashboard from "./pages/ccp/ThermalDashboard";
+import ThermalNewReading from "./pages/ccp/ThermalNewReading";
+import ThermalRecords from "./pages/ccp/ThermalRecords";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +64,10 @@ const App = () => (
           <Route path="/ccp/deviations" element={<CcpDeviations />} />
           <Route path="/ccp/hold-products" element={<CcpHoldProducts />} />
           <Route path="/ccp/verification" element={<CcpVerification />} />
+          {/* HACCP CCP — Thermal (cooking / freezing) */}
+          <Route path="/ccp/thermal" element={<ThermalDashboard />} />
+          <Route path="/ccp/thermal/new" element={<ThermalNewReading />} />
+          <Route path="/ccp/thermal/records" element={<ThermalRecords />} />
           {/* NCR/CAPA */}
           <Route path="/ncr" element={<NCRList />} />
           <Route path="/ncr/new" element={<NCRForm />} />

@@ -7,6 +7,9 @@ import type {
   MetalTest,
   ProductHold,
   Verification,
+  ThermalDashboard,
+  ThermalEquipment,
+  ThermalLog,
 } from '@/lib/ccp-types';
 
 // Small demo fallbacks so the static mirror (no Functions backend) still renders.
@@ -115,5 +118,57 @@ export function useVerifications() {
       }
     },
     staleTime: 15_000,
+  });
+}
+
+const mockThermalDashboard: ThermalDashboard = {
+  checksToday: 0, passRate: null, failCount: 0, cookingToday: 0, freezingToday: 0,
+  openDeviations: 0, productsOnHold: 0, pendingVerification: 0, lastCooking: null, lastFreezing: null,
+};
+
+const mockThermalEquipment: ThermalEquipment[] = [
+  { id: 'COOK-01', name: 'เตาต้ม/สตีมเมอร์ Line 1', type: 'COOKER', stage: 'COOKING', location: 'Cooking Area', line: 'Line 1', ccpId: 'CCP004', lastCalibratedAt: '', status: 'ACTIVE', limitValue: 75, limitDirection: 'MIN', unit: 'C', minHoldMinutes: 1 },
+  { id: 'BFRZ-01', name: 'Blast Freezer #1', type: 'BLAST_FREEZER', stage: 'FREEZING', location: 'Freezing Area', line: 'Line 1', ccpId: 'CCP005', lastCalibratedAt: '', status: 'ACTIVE', limitValue: -18, limitDirection: 'MAX', unit: 'C', minHoldMinutes: null },
+];
+
+export function useThermalDashboard() {
+  return useQuery<ThermalDashboard>({
+    queryKey: ['ccp', 'thermal-dashboard'],
+    queryFn: async () => {
+      try {
+        return await apiGet<ThermalDashboard>('/api/ccp/thermal-dashboard');
+      } catch {
+        return mockThermalDashboard;
+      }
+    },
+    staleTime: 15_000,
+  });
+}
+
+export function useThermalLogs() {
+  return useQuery<ThermalLog[]>({
+    queryKey: ['ccp', 'thermal-logs'],
+    queryFn: async () => {
+      try {
+        return await apiGet<ThermalLog[]>('/api/ccp/thermal-logs');
+      } catch {
+        return [];
+      }
+    },
+    staleTime: 15_000,
+  });
+}
+
+export function useThermalEquipment() {
+  return useQuery<ThermalEquipment[]>({
+    queryKey: ['ccp', 'thermal-equipment'],
+    queryFn: async () => {
+      try {
+        return await apiGet<ThermalEquipment[]>('/api/ccp/thermal-equipment');
+      } catch {
+        return mockThermalEquipment;
+      }
+    },
+    staleTime: 60_000,
   });
 }
