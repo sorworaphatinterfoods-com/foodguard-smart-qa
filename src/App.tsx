@@ -42,6 +42,9 @@ const CcpVerification = lazy(() => import("./pages/ccp/CcpVerification"));
 const ThermalDashboard = lazy(() => import("./pages/ccp/ThermalDashboard"));
 const ThermalNewReading = lazy(() => import("./pages/ccp/ThermalNewReading"));
 const ThermalRecords = lazy(() => import("./pages/ccp/ThermalRecords"));
+const ColdChainDashboard = lazy(() => import("./pages/ccp/ColdChainDashboard"));
+const ColdChainNewReading = lazy(() => import("./pages/ccp/ColdChainNewReading"));
+const ColdChainRecords = lazy(() => import("./pages/ccp/ColdChainRecords"));
 
 const queryClient = new QueryClient();
 
@@ -71,6 +74,10 @@ const App = () => (
           <Route path="/ccp/thermal" element={<ThermalDashboard />} />
           <Route path="/ccp/thermal/new" element={<ThermalNewReading />} />
           <Route path="/ccp/thermal/records" element={<ThermalRecords />} />
+          {/* HACCP CCP — Cold chain (storage / transport) */}
+          <Route path="/ccp/coldchain" element={<ColdChainDashboard />} />
+          <Route path="/ccp/coldchain/new" element={<ColdChainNewReading />} />
+          <Route path="/ccp/coldchain/records" element={<ColdChainRecords />} />
           {/* NCR/CAPA */}
           <Route path="/ncr" element={<NCRList />} />
           <Route path="/ncr/new" element={<NCRForm />} />

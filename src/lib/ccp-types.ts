@@ -209,3 +209,67 @@ export const THERMAL_LIMITS = {
   COOKING: { direction: 'MIN' as const, value: 75, unit: '°C', label: 'อุณหภูมิแกนหลังทำสุก ≥ 75°C' },
   FREEZING: { direction: 'MAX' as const, value: -18, unit: '°C', label: 'อุณหภูมิแกนหลังแช่แข็ง ≤ -18°C' },
 };
+
+// ---- Cold-chain / chilling CCP ----
+export type ColdChainPointType = 'FREEZER' | 'COLD_ROOM' | 'CHILLER' | 'TRANSPORT' | 'OTHER';
+
+export interface ColdChainPoint {
+  id: string;
+  name: string;
+  type: ColdChainPointType;
+  location: string;
+  limitMin: number | null;
+  limitMax: number | null;
+  unit: string;
+  targetLabel: string;
+  checkIntervalHours: number | null;
+  ccpId: string;
+  status: 'ACTIVE' | 'MAINTENANCE' | 'INACTIVE';
+  lastTemp: number | null;
+  lastResult: string;
+  lastAt: string;
+}
+
+export interface ColdChainLog {
+  id: string;
+  ref: string;
+  datetime: string;
+  shift: string;
+  pointId: string;
+  pointName: string;
+  pointType: string;
+  temp: number;
+  limitMin: number | null;
+  limitMax: number | null;
+  product: string;
+  fgCode: string;
+  lot: string;
+  result: PassFail;
+  excursionMinutes: number | null;
+  affectedFrom: string;
+  affectedTo: string;
+  qtyHeld: number | null;
+  qtyUnit: string;
+  correctiveAction: string;
+  finalDisposition: string;
+  recordedBy: string;
+  verifiedBy: string;
+  verifiedAt: string;
+  remark: string;
+  attachmentUrl: string;
+  deviationId: string;
+  holdId: string;
+  capaId: string;
+  status: 'CLOSED' | 'PENDING_VERIFICATION' | 'VOID';
+}
+
+export interface ColdChainDashboard {
+  checksToday: number;
+  passRate: number | null;
+  failCount: number;
+  totalPoints: number;
+  pointsInAlarm: number;
+  productsOnHold: number;
+  pendingVerification: number;
+  openDeviations: number;
+}

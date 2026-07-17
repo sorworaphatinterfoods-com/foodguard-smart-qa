@@ -10,6 +10,9 @@ import type {
   ThermalDashboard,
   ThermalEquipment,
   ThermalLog,
+  ColdChainPoint,
+  ColdChainLog,
+  ColdChainDashboard,
 } from '@/lib/ccp-types';
 
 // Small demo fallbacks so the static mirror (no Functions backend) still renders.
@@ -170,5 +173,59 @@ export function useThermalEquipment() {
       }
     },
     staleTime: 60_000,
+  });
+}
+
+const mockColdChainPoints: ColdChainPoint[] = [
+  { id: 'CR-01', name: 'ห้องเย็นเก็บ FG #1 (Frozen)', type: 'FREEZER', location: 'FG Cold Store', limitMin: -30, limitMax: -18, unit: 'C', targetLabel: '≤ -18°C', checkIntervalHours: 4, ccpId: 'CCP006', status: 'ACTIVE', lastTemp: -21.5, lastResult: 'PASS', lastAt: '' },
+  { id: 'CR-02', name: 'ห้องเย็นเก็บ FG #2 (Frozen)', type: 'FREEZER', location: 'FG Cold Store', limitMin: -30, limitMax: -18, unit: 'C', targetLabel: '≤ -18°C', checkIntervalHours: 4, ccpId: 'CCP006', status: 'ACTIVE', lastTemp: -19.8, lastResult: 'PASS', lastAt: '' },
+  { id: 'CH-01', name: 'ห้องเย็นวัตถุดิบ (Chiller)', type: 'CHILLER', location: 'RM Chiller', limitMin: 0, limitMax: 4, unit: 'C', targetLabel: '0 – 4°C', checkIntervalHours: 4, ccpId: 'CCP006', status: 'ACTIVE', lastTemp: 2.6, lastResult: 'PASS', lastAt: '' },
+  { id: 'TRK-01', name: 'รถห้องเย็น Reefer #1', type: 'TRANSPORT', location: 'Dispatch', limitMin: -30, limitMax: -18, unit: 'C', targetLabel: '≤ -18°C', checkIntervalHours: 2, ccpId: 'CCP006', status: 'ACTIVE', lastTemp: null, lastResult: '', lastAt: '' },
+];
+
+const mockColdChainDashboard: ColdChainDashboard = {
+  checksToday: 0, passRate: null, failCount: 0, totalPoints: 4,
+  pointsInAlarm: 0, productsOnHold: 0, pendingVerification: 0, openDeviations: 0,
+};
+
+export function useColdChainPoints() {
+  return useQuery<ColdChainPoint[]>({
+    queryKey: ['ccp', 'coldchain-points'],
+    queryFn: async () => {
+      try {
+        return await apiGet<ColdChainPoint[]>('/api/ccp/coldchain-points');
+      } catch {
+        return mockColdChainPoints;
+      }
+    },
+    staleTime: 15_000,
+  });
+}
+
+export function useColdChainLogs() {
+  return useQuery<ColdChainLog[]>({
+    queryKey: ['ccp', 'coldchain-logs'],
+    queryFn: async () => {
+      try {
+        return await apiGet<ColdChainLog[]>('/api/ccp/coldchain-logs');
+      } catch {
+        return [];
+      }
+    },
+    staleTime: 15_000,
+  });
+}
+
+export function useColdChainDashboard() {
+  return useQuery<ColdChainDashboard>({
+    queryKey: ['ccp', 'coldchain-dashboard'],
+    queryFn: async () => {
+      try {
+        return await apiGet<ColdChainDashboard>('/api/ccp/coldchain-dashboard');
+      } catch {
+        return mockColdChainDashboard;
+      }
+    },
+    staleTime: 15_000,
   });
 }

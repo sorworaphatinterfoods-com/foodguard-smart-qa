@@ -7,7 +7,7 @@ import {
   ClipboardList, Thermometer, AlertTriangle, Leaf,
   Wrench, CheckSquare, MessageSquare, GitBranch,
   Droplets, ShieldAlert, Search as SearchIcon, FileText,
-  Database, BarChart3, Magnet, ScanLine,
+  Database, BarChart3, Magnet, ScanLine, Snowflake,
 } from 'lucide-react';
 
 const modules = [
@@ -16,6 +16,7 @@ const modules = [
   { title: 'CCP Monitoring', description: 'จุดควบคุมวิกฤต HACCP', icon: Thermometer, path: '/ccp', badge: 1, badgeStatus: 'fail' as const },
   { title: 'CCP Metal Detector (HACCP)', description: 'ตรวจโลหะก่อนบรรจุ · ไม้เสียบเนื้อแช่แข็ง', icon: ScanLine, path: '/ccp/dashboard' },
   { title: 'CCP อุณหภูมิ (Cooking/Freezing)', description: 'ทำสุก ≥75°C · แช่แข็ง ≤-18°C', icon: Thermometer, path: '/ccp/thermal' },
+  { title: 'CCP Cold Chain (เก็บ/ขนส่ง)', description: 'ห้องเย็น · ตู้แช่ · รถห้องเย็น ≤-18°C', icon: Snowflake, path: '/ccp/coldchain' },
   { title: 'Metal Detector', description: 'ทดสอบเครื่องตรวจโลหะ Fe/NonFe/SUS', icon: Magnet, path: '/metal-detector' },
   { title: 'NCR / CAPA', description: 'รายงานความไม่สอดคล้อง & แก้ไข', icon: AlertTriangle, path: '/ncr', badge: 2, badgeStatus: 'warning' as const },
   { title: 'Deviations & CAPA', description: 'ความผิดปกติ & การแก้ไข', icon: ShieldAlert, path: '/deviations', badge: mockDeviations.filter(d => d.status === 'OPEN').length, badgeStatus: 'fail' as const },
