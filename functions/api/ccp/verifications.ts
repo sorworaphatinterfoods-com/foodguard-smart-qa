@@ -19,10 +19,18 @@ interface VerRow {
 }
 
 export async function onRequestGet(context: CcpContext): Promise<Response> {
+  // Join both CCP sources (metal detector + thermal) and coalesce the fields.
   const { results } = await context.env.DB.prepare(
-    `SELECT v.*, t.product_name, t.lot_no, t.line_no, t.ccp_result, t.device_id, t.test_datetime
+    `SELECT v.*,
+            COALESCE(t.product_name, h.product_name) AS product_name,
+            COALESCE(t.lot_no, h.lot_no)             AS lot_no,
+            COALESCE(t.line_no, h.line_no)           AS line_no,
+            COALESCE(t.ccp_result, h.ccp_result)     AS ccp_result,
+            COALESCE(t.device_id, h.equipment_id)    AS device_id,
+            COALESCE(t.test_datetime, h.log_datetime) AS test_datetime
      FROM verification_records v
      LEFT JOIN metal_detector_test_logs t ON t.test_id = v.source_ref
+     LEFT JOIN thermal_monitoring_logs   h ON h.log_id  = v.source_ref
      ORDER BY CASE v.result WHEN 'PENDING' THEN 0 ELSE 1 END, v.created_at DESC`,
   ).all<VerRow & Record<string, unknown>>();
 
@@ -70,8 +78,8 @@ export async function onRequestPost(context: CcpContext): Promise<Response> {
   }
 
   const ver = await db
-    .prepare(`SELECT verification_id, source_ref FROM verification_records WHERE verification_id = ?`)
-    .first<{ verification_id: string; source_ref: string }>();
+    .prepare(`SELECT verification_id, source_ref, source_type FROM verification_records WHERE verification_id = ?`)
+    .first<{ verification_id: string; source_ref: string; source_type: string }>();
   if (!ver) return json({ error: 'verification not found' }, 404);
 
   // Stand-in e-signature: hash of who+when+what. Real e-sign payload later.
@@ -88,16 +96,27 @@ export async function onRequestPost(context: CcpContext): Promise<Response> {
     .bind(result, body.verifiedBy, body.comment ?? null, signature, body.id)
     .run();
 
-  // Reflect the QA sign-off onto the source test + its deviation.
+  // Reflect the QA sign-off onto the correct source table + its deviation.
   const testStatus = result === 'VERIFIED' ? 'CLOSED' : 'PENDING_VERIFICATION';
-  await db
-    .prepare(
-      `UPDATE metal_detector_test_logs
-         SET verified_by = ?, verified_at = datetime('now'), status = ?, updated_at = datetime('now')
-       WHERE test_id = ?`,
-    )
-    .bind(body.verifiedBy, testStatus, ver.source_ref)
-    .run();
+  if (ver.source_type === 'THERMAL_CCP') {
+    await db
+      .prepare(
+        `UPDATE thermal_monitoring_logs
+           SET verified_by = ?, verified_at = datetime('now'), status = ?, updated_at = datetime('now')
+         WHERE log_id = ?`,
+      )
+      .bind(body.verifiedBy, testStatus, ver.source_ref)
+      .run();
+  } else {
+    await db
+      .prepare(
+        `UPDATE metal_detector_test_logs
+           SET verified_by = ?, verified_at = datetime('now'), status = ?, updated_at = datetime('now')
+         WHERE test_id = ?`,
+      )
+      .bind(body.verifiedBy, testStatus, ver.source_ref)
+      .run();
+  }
 
   if (result === 'VERIFIED') {
     await db

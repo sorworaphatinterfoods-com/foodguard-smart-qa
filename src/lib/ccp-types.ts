@@ -134,3 +134,78 @@ export const FREQUENCY_TYPES = [
   'After maintenance',
   'End of production',
 ] as const;
+
+// ---- Thermal CCP (cooking / freezing) ----
+export type ThermalStage = 'COOKING' | 'FREEZING';
+
+export interface ThermalLog {
+  id: string;
+  ref: string;
+  datetime: string;
+  shift: string;
+  line: string;
+  stage: ThermalStage;
+  product: string;
+  fgCode: string;
+  lot: string;
+  batch: string;
+  equipmentId: string;
+  probeId: string;
+  frequencyType: string;
+  coreTemp: number | null;
+  holdMinutes: number | null;
+  limitValue: number | null;
+  limitDirection: string;
+  result: PassFail;
+  productionStopped: boolean;
+  affectedFrom: string;
+  affectedTo: string;
+  qtyHeld: number | null;
+  qtyUnit: string;
+  correctiveAction: string;
+  finalDisposition: string;
+  inspector: string;
+  verifiedBy: string;
+  verifiedAt: string;
+  remark: string;
+  attachmentUrl: string;
+  deviationId: string;
+  holdId: string;
+  capaId: string;
+  status: 'CLOSED' | 'PENDING_VERIFICATION' | 'VOID';
+}
+
+export interface ThermalEquipment {
+  id: string;
+  name: string;
+  type: 'COOKER' | 'BLAST_FREEZER' | 'PROBE' | 'OTHER';
+  stage: string;
+  location: string;
+  line: string;
+  ccpId: string;
+  lastCalibratedAt: string;
+  status: 'ACTIVE' | 'MAINTENANCE' | 'INACTIVE';
+  limitValue: number | null;
+  limitDirection: string;
+  unit: string;
+  minHoldMinutes: number | null;
+}
+
+export interface ThermalDashboard {
+  checksToday: number;
+  passRate: number | null;
+  failCount: number;
+  cookingToday: number;
+  freezingToday: number;
+  openDeviations: number;
+  productsOnHold: number;
+  pendingVerification: number;
+  lastCooking: { at: string; result: PassFail; temp: number } | null;
+  lastFreezing: { at: string; result: PassFail; temp: number } | null;
+}
+
+// Locked thermal critical limits (frozen meat skewers).
+export const THERMAL_LIMITS = {
+  COOKING: { direction: 'MIN' as const, value: 75, unit: '°C', label: 'อุณหภูมิแกนหลังทำสุก ≥ 75°C' },
+  FREEZING: { direction: 'MAX' as const, value: -18, unit: '°C', label: 'อุณหภูมิแกนหลังแช่แข็ง ≤ -18°C' },
+};
