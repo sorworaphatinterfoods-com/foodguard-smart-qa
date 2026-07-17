@@ -1,45 +1,50 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import ReceivingList from "./pages/ReceivingList";
-import ReceivingForm from "./pages/ReceivingForm";
-import CCPList from "./pages/CCPList";
-import CCPForm from "./pages/CCPForm";
-import NCRList from "./pages/NCRList";
-import NCRForm from "./pages/NCRForm";
-import CalibrationList from "./pages/CalibrationList";
-import MoreModules from "./pages/MoreModules";
-import EnvironmentList from "./pages/EnvironmentList";
-import EnvironmentForm from "./pages/EnvironmentForm";
-import AuditList from "./pages/AuditList";
-import AuditForm from "./pages/AuditForm";
-import ComplaintList from "./pages/ComplaintList";
-import ComplaintForm from "./pages/ComplaintForm";
-import TraceabilityPage from "./pages/TraceabilityPage";
-import WaterQualityList from "./pages/WaterQualityList";
-import WaterQualityForm from "./pages/WaterQualityForm";
-import AllergenList from "./pages/AllergenList";
-import AllergenForm from "./pages/AllergenForm";
-import MetalDetectorList from "./pages/MetalDetectorList";
-import MetalDetectorForm from "./pages/MetalDetectorForm";
-import DeviationList from "./pages/DeviationList";
-import InspectionLogList from "./pages/InspectionLogList";
-import InspectionForm from "./pages/InspectionForm";
-import SamplingPlanPage from "./pages/SamplingPlanPage";
-import MasterDataPage from "./pages/MasterDataPage";
-import CcpDashboard from "./pages/ccp/CcpDashboard";
-import MetalDetectorNewTest from "./pages/ccp/MetalDetectorNewTest";
-import MetalDetectorTestRecords from "./pages/ccp/MetalDetectorTestRecords";
-import CcpDeviations from "./pages/ccp/CcpDeviations";
-import CcpHoldProducts from "./pages/ccp/CcpHoldProducts";
-import CcpVerification from "./pages/ccp/CcpVerification";
-import ThermalDashboard from "./pages/ccp/ThermalDashboard";
-import ThermalNewReading from "./pages/ccp/ThermalNewReading";
-import ThermalRecords from "./pages/ccp/ThermalRecords";
+
+const Index = lazy(() => import("./pages/Index"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const ReceivingList = lazy(() => import("./pages/ReceivingList"));
+const ReceivingForm = lazy(() => import("./pages/ReceivingForm"));
+const CCPList = lazy(() => import("./pages/CCPList"));
+const CCPForm = lazy(() => import("./pages/CCPForm"));
+const NCRList = lazy(() => import("./pages/NCRList"));
+const NCRForm = lazy(() => import("./pages/NCRForm"));
+const CalibrationList = lazy(() => import("./pages/CalibrationList"));
+const MoreModules = lazy(() => import("./pages/MoreModules"));
+const EnvironmentList = lazy(() => import("./pages/EnvironmentList"));
+const EnvironmentForm = lazy(() => import("./pages/EnvironmentForm"));
+const AuditList = lazy(() => import("./pages/AuditList"));
+const AuditForm = lazy(() => import("./pages/AuditForm"));
+const ComplaintList = lazy(() => import("./pages/ComplaintList"));
+const ComplaintForm = lazy(() => import("./pages/ComplaintForm"));
+const TraceabilityPage = lazy(() => import("./pages/TraceabilityPage"));
+const WaterQualityList = lazy(() => import("./pages/WaterQualityList"));
+const WaterQualityForm = lazy(() => import("./pages/WaterQualityForm"));
+const AllergenList = lazy(() => import("./pages/AllergenList"));
+const AllergenForm = lazy(() => import("./pages/AllergenForm"));
+const MetalDetectorList = lazy(() => import("./pages/MetalDetectorList"));
+const MetalDetectorForm = lazy(() => import("./pages/MetalDetectorForm"));
+const DeviationList = lazy(() => import("./pages/DeviationList"));
+const InspectionLogList = lazy(() => import("./pages/InspectionLogList"));
+const InspectionForm = lazy(() => import("./pages/InspectionForm"));
+const SamplingPlanPage = lazy(() => import("./pages/SamplingPlanPage"));
+const MasterDataPage = lazy(() => import("./pages/MasterDataPage"));
+const CcpDashboard = lazy(() => import("./pages/ccp/CcpDashboard"));
+const MetalDetectorNewTest = lazy(() => import("./pages/ccp/MetalDetectorNewTest"));
+const MetalDetectorTestRecords = lazy(() => import("./pages/ccp/MetalDetectorTestRecords"));
+const CcpDeviations = lazy(() => import("./pages/ccp/CcpDeviations"));
+const CcpHoldProducts = lazy(() => import("./pages/ccp/CcpHoldProducts"));
+const CcpVerification = lazy(() => import("./pages/ccp/CcpVerification"));
+const ThermalDashboard = lazy(() => import("./pages/ccp/ThermalDashboard"));
+const ThermalNewReading = lazy(() => import("./pages/ccp/ThermalNewReading"));
+const ThermalRecords = lazy(() => import("./pages/ccp/ThermalRecords"));
+const ColdChainDashboard = lazy(() => import("./pages/ccp/ColdChainDashboard"));
+const ColdChainNewReading = lazy(() => import("./pages/ccp/ColdChainNewReading"));
+const ColdChainRecords = lazy(() => import("./pages/ccp/ColdChainRecords"));
 
 const queryClient = new QueryClient();
 
@@ -49,7 +54,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <Routes>
+        <Suspense fallback={null}>
+          <Routes>
           <Route path="/" element={<Index />} />
           {/* Receiving */}
           <Route path="/receiving" element={<ReceivingList />} />
@@ -68,6 +74,10 @@ const App = () => (
           <Route path="/ccp/thermal" element={<ThermalDashboard />} />
           <Route path="/ccp/thermal/new" element={<ThermalNewReading />} />
           <Route path="/ccp/thermal/records" element={<ThermalRecords />} />
+          {/* HACCP CCP — Cold chain (storage / transport) */}
+          <Route path="/ccp/coldchain" element={<ColdChainDashboard />} />
+          <Route path="/ccp/coldchain/new" element={<ColdChainNewReading />} />
+          <Route path="/ccp/coldchain/records" element={<ColdChainRecords />} />
           {/* NCR/CAPA */}
           <Route path="/ncr" element={<NCRList />} />
           <Route path="/ncr/new" element={<NCRForm />} />
@@ -105,7 +115,8 @@ const App = () => (
           {/* More */}
           <Route path="/more" element={<MoreModules />} />
           <Route path="*" element={<NotFound />} />
-        </Routes>
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

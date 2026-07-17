@@ -19,18 +19,19 @@ interface VerRow {
 }
 
 export async function onRequestGet(context: CcpContext): Promise<Response> {
-  // Join both CCP sources (metal detector + thermal) and coalesce the fields.
+  // Join all CCP sources (metal detector + thermal + cold-chain) and coalesce.
   const { results } = await context.env.DB.prepare(
     `SELECT v.*,
-            COALESCE(t.product_name, h.product_name) AS product_name,
-            COALESCE(t.lot_no, h.lot_no)             AS lot_no,
-            COALESCE(t.line_no, h.line_no)           AS line_no,
-            COALESCE(t.ccp_result, h.ccp_result)     AS ccp_result,
-            COALESCE(t.device_id, h.equipment_id)    AS device_id,
-            COALESCE(t.test_datetime, h.log_datetime) AS test_datetime
+            COALESCE(t.product_name, h.product_name, c.product_name) AS product_name,
+            COALESCE(t.lot_no, h.lot_no, c.lot_no)                   AS lot_no,
+            COALESCE(t.line_no, h.line_no, c.point_id)               AS line_no,
+            COALESCE(t.ccp_result, h.ccp_result, c.ccp_result)       AS ccp_result,
+            COALESCE(t.device_id, h.equipment_id, c.point_id)        AS device_id,
+            COALESCE(t.test_datetime, h.log_datetime, c.log_datetime) AS test_datetime
      FROM verification_records v
      LEFT JOIN metal_detector_test_logs t ON t.test_id = v.source_ref
      LEFT JOIN thermal_monitoring_logs   h ON h.log_id  = v.source_ref
+     LEFT JOIN coldchain_logs            c ON c.log_id  = v.source_ref
      ORDER BY CASE v.result WHEN 'PENDING' THEN 0 ELSE 1 END, v.created_at DESC`,
   ).all<VerRow & Record<string, unknown>>();
 
@@ -102,6 +103,15 @@ export async function onRequestPost(context: CcpContext): Promise<Response> {
     await db
       .prepare(
         `UPDATE thermal_monitoring_logs
+           SET verified_by = ?, verified_at = datetime('now'), status = ?, updated_at = datetime('now')
+         WHERE log_id = ?`,
+      )
+      .bind(body.verifiedBy, testStatus, ver.source_ref)
+      .run();
+  } else if (ver.source_type === 'COLDCHAIN_CCP') {
+    await db
+      .prepare(
+        `UPDATE coldchain_logs
            SET verified_by = ?, verified_at = datetime('now'), status = ?, updated_at = datetime('now')
          WHERE log_id = ?`,
       )
