@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/lib/api';
-import { mockProcesses, mockProducts, mockParameters, mockEquipment } from '@/lib/mock-data';
 
 export interface ProcessOption {
   processId: string;
@@ -28,18 +27,10 @@ export interface ParameterOption {
   unit: string;
 }
 
-// Master-data option lists for form pickers — live from D1 with mock fallback.
-
 export function useProcesses() {
   return useQuery<ProcessOption[]>({
     queryKey: ['processes'],
-    queryFn: async () => {
-      try {
-        return await apiGet<ProcessOption[]>('/api/processes');
-      } catch {
-        return mockProcesses.map((p) => ({ processId: p.processId, processName: p.processName, area: p.area }));
-      }
-    },
+    queryFn: () => apiGet<ProcessOption[]>('/api/processes'),
     staleTime: 60_000,
   });
 }
@@ -47,13 +38,7 @@ export function useProcesses() {
 export function useEquipment() {
   return useQuery<EquipmentOption[]>({
     queryKey: ['equipment'],
-    queryFn: async () => {
-      try {
-        return await apiGet<EquipmentOption[]>('/api/equipment');
-      } catch {
-        return mockEquipment.map((e) => ({ equipmentId: e.equipmentId, equipmentName: e.equipmentName, equipmentType: '' }));
-      }
-    },
+    queryFn: () => apiGet<EquipmentOption[]>('/api/equipment'),
     staleTime: 60_000,
   });
 }
@@ -61,13 +46,7 @@ export function useEquipment() {
 export function useFinishedGoods() {
   return useQuery<FinishedGoodOption[]>({
     queryKey: ['finished-goods'],
-    queryFn: async () => {
-      try {
-        return await apiGet<FinishedGoodOption[]>('/api/finished-goods');
-      } catch {
-        return mockProducts.map((p) => ({ productId: p.productId, productName: p.productName, productType: p.productType }));
-      }
-    },
+    queryFn: () => apiGet<FinishedGoodOption[]>('/api/finished-goods'),
     staleTime: 60_000,
   });
 }
@@ -75,19 +54,7 @@ export function useFinishedGoods() {
 export function useParameters() {
   return useQuery<ParameterOption[]>({
     queryKey: ['parameters'],
-    queryFn: async () => {
-      try {
-        return await apiGet<ParameterOption[]>('/api/parameters');
-      } catch {
-        return mockParameters.map((p) => ({
-          id: p.parameter,
-          name: p.parameter,
-          category: p.isCCP ? 'Food Safety' : '',
-          specLimit: `${p.specMin ?? '—'} - ${p.specMax ?? '—'}`,
-          unit: p.unit,
-        }));
-      }
-    },
+    queryFn: () => apiGet<ParameterOption[]>('/api/parameters'),
     staleTime: 60_000,
   });
 }
